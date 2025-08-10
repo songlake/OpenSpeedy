@@ -1,7 +1,7 @@
 name: Build OpenSpeedy (64-bit Cloud)
 
 on:
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -15,29 +15,29 @@ jobs:
 
     - name: Install dependencies
       run: |
-        choco install visualstudio2022community visualstudio2022buildtools visualstudio2022-workload-vctools cmake ninja -y
+        choco install visualstudio2022buildtools visualstudio2022-workload-vctools cmake ninja -y
         python -m pip install --upgrade pip
         pip install aqtinstall
-        # 安装 Qt 6.2.4 - 64 位 MSVC2019
-        python -m aqt install-qt windows desktop 6.2.4 win64_msvc2019_64
+        # 安装 Qt 5.15.2 MSVC2019 64-bit
+        python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 --outputdir C:\Qt
+        echo "QT_DIR=C:\Qt\5.15.2\msvc2019_64" | Out-File -FilePath $env:GITHUB_ENV -Append
+        echo "CMAKE_PREFIX_PATH=C:\Qt\5.15.2\msvc2019_64" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-    - name: Build 64-bit
+    - name: Build
       shell: cmd
       run: |
-        call script\initenv.bat
-        call script\build64.bat
+        call "%QT_DIR%\bin\qtenv2.bat"
+        cmake -B build -S . -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+        cmake --build build --config Release
 
     - name: Collect artifacts
-      shell: cmd
       run: |
-        if not exist "artifacts" mkdir artifacts
-        copy "build\CMAKE-64bit-Release\OpenSpeedy.exe" artifacts\
-        copy "build\CMAKE-64bit-Release\speedpatch64.dll" artifacts\
-        copy "build\CMAKE-64bit-Release\bridge64.exe" artifacts\
-        dir artifacts
+        mkdir artifacts
+        copy build\*.exe artifacts\
+        copy build\*.dll artifacts\
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: OpenSpeedy-64bit-build
+        name: OpenSpeedy-64bit
         path: artifacts/
