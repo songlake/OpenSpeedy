@@ -27,11 +27,16 @@ jobs:
         call script\initenv.bat
         call script\build64.bat
 
+    - name: Show build output files
+      shell: cmd
+      run: dir build\CMAKE-64bit-Release\Release\
+
     - name: Collect artifacts
+      shell: cmd
       run: |
         mkdir artifacts
-        copy build\*.exe artifacts\
-        copy build\*.dll artifacts\
+        xcopy build\CMAKE-64bit-Release\Release\*.exe artifacts\ /Y
+        xcopy build\CMAKE-64bit-Release\Release\*.dll artifacts\ /Y
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
