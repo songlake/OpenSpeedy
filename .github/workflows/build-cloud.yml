@@ -35,8 +35,7 @@ jobs:
       shell: cmd
       run: |
         mkdir artifacts
-        xcopy build\CMAKE-64bit-Release\Release\*.exe artifacts\ /Y
-        xcopy build\CMAKE-64bit-Release\Release\*.dll artifacts\ /Y
+        xcopy build\CMAKE-64bit-Release\Release\*.* artifacts\ /Y /E
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
