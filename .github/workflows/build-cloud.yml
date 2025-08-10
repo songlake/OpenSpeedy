@@ -1,13 +1,12 @@
-name: Build OpenSpeedy (Cloud Parallel)
+name: Build OpenSpeedy (Cloud Serial Fixed)
 
 on:
   workflow_dispatch:
 
 jobs:
-  build-64bit:
+  build:
     runs-on: windows-latest
-    outputs:
-      artifact-sha256: ${{ steps.sha256.outputs.sha256 }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,7 +15,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install aqtinstall
-          aqt install-qt windows desktop 6.6.0 msvc2019_64
+          aqt install-qt windows desktop 6.6.0 msvc2019_64 --modules qt6-base
 
       - name: Build 64-bit
         shell: cmd
@@ -24,43 +23,18 @@ jobs:
           call script\initenv.bat
           call script\build64.bat
 
-      - name: Collect 64-bit artifacts
+      - name: Calculate SHA256 of 64-bit OpenSpeedy.exe
         shell: cmd
         run: |
-          if not exist "artifacts" mkdir artifacts
-          copy "build\CMAKE-64bit-Release\OpenSpeedy.exe" artifacts\
-          copy "build\CMAKE-64bit-Release\speedpatch64.dll" artifacts\
-          copy "build\CMAKE-64bit-Release\bridge64.exe" artifacts\
-          dir artifacts
-
-      - name: Calculate SHA256 of 64-bit OpenSpeedy.exe
-        id: sha256
-        run: |
-          CertUtil -hashfile artifacts\OpenSpeedy.exe SHA256
-          for /f "tokens=1,* delims= " %%a in ('CertUtil -hashfile artifacts\OpenSpeedy.exe SHA256 ^| findstr /v "hash CertUtil"') do echo %%b > sha256.txt
+          CertUtil -hashfile build\CMAKE-64bit-Release\OpenSpeedy.exe SHA256
+          for /f "tokens=1,* delims= " %%a in ('CertUtil -hashfile build\CMAKE-64bit-Release\OpenSpeedy.exe SHA256 ^| findstr /v "hash CertUtil"') do echo %%b > sha256.txt
           set /p sha256=<sha256.txt
-          echo "::set-output name=sha256::%sha256%"
-
-      - name: Upload 64-bit artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: OpenSpeedy-64bit-artifacts
-          path: artifacts/
-
-  build-32bit:
-    runs-on: windows-latest
-    needs: build-64bit
-    outputs:
-      artifact-sha256: ${{ steps.sha256.outputs.sha256 }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+          echo SHA256 (64-bit OpenSpeedy.exe): %sha256%
 
       - name: Install dependencies for 32-bit
         run: |
-          python -m pip install --upgrade pip
           pip install aqtinstall
-          aqt install-qt windows desktop 6.6.0 msvc2019
+          aqt install-qt windows desktop 6.6.0 msvc2019 --modules qt6-base
 
       - name: Build 32-bit
         shell: cmd
@@ -68,24 +42,21 @@ jobs:
           call script\initenv.bat
           call script\build32.bat
 
-      - name: Collect 32-bit artifacts
+      - name: Calculate SHA256 of 32-bit speedpatch32.dll
         shell: cmd
         run: |
-          if not exist "artifacts" mkdir artifacts
-          copy "build\CMAKE-32bit-Release\speedpatch32.dll" artifacts\
-          copy "build\CMAKE-32bit-Release\bridge32.exe" artifacts\
-          dir artifacts
-
-      - name: Calculate SHA256 of 32-bit speedpatch32.dll
-        id: sha256
-        run: |
-          CertUtil -hashfile artifacts\speedpatch32.dll SHA256
-          for /f "tokens=1,* delims= " %%a in ('CertUtil -hashfile artifacts\speedpatch32.dll SHA256 ^| findstr /v "hash CertUtil"') do echo %%b > sha256.txt
+          CertUtil -hashfile build\CMAKE-32bit-Release\speedpatch32.dll SHA256
+          for /f "tokens=1,* delims= " %%a in ('CertUtil -hashfile build\CMAKE-32bit-Release\speedpatch32.dll SHA256 ^| findstr /v "hash CertUtil"') do echo %%b > sha256.txt
           set /p sha256=<sha256.txt
-          echo "::set-output name=sha256::%sha256%"
+          echo SHA256 (32-bit speedpatch32.dll): %sha256%
 
-      - name: Upload 32-bit artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: OpenSpeedy-32bit-artifacts
-          path: artifacts/
+          name: OpenSpeedy-artifacts
+          path: |
+            build\CMAKE-64bit-Release\OpenSpeedy.exe
+            build\CMAKE-64bit-Release\speedpatch64.dll
+            build\CMAKE-64bit-Release\bridge64.exe
+            build\CMAKE-32bit-Release\speedpatch32.dll
+            build\CMAKE-32bit-Release\bridge32.exe
