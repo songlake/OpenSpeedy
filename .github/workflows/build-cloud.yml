@@ -1,4 +1,4 @@
-name: Build OpenSpeedy (Cloud)
+name: Build OpenSpeedy (64-bit Cloud)
 
 on:
   workflow_dispatch:  # 手动触发
@@ -7,38 +7,26 @@ on:
       - master
 
 jobs:
-  build:
+  build64:
     runs-on: windows-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
-    # 安装必要工具（CMake、Visual Studio、Qt）
     - name: Install dependencies
       run: |
         choco install visualstudio2022community visualstudio2022buildtools visualstudio2022-workload-vctools cmake ninja -y
         python -m pip install --upgrade pip
         pip install aqtinstall
-        # 安装 Qt 6.2.4 - 64位
+        # 安装 Qt 6.2.4 - 64 位 MSVC2019
         python -m aqt install-qt windows desktop 6.2.4 win64_msvc2019_64
-        # 安装 Qt 6.2.4 - 32位
-        python -m aqt install-qt windows desktop 6.2.4 win32_msvc2019
 
-    # 编译 64 位
     - name: Build 64-bit
       shell: cmd
       run: |
         call script\initenv.bat
         call script\build64.bat
 
-    # 编译 32 位
-    - name: Build 32-bit
-      shell: cmd
-      run: |
-        call script\initenv.bat
-        call script\build32.bat
-
-    # 收集编译产物
     - name: Collect artifacts
       shell: cmd
       run: |
@@ -46,13 +34,10 @@ jobs:
         copy "build\CMAKE-64bit-Release\OpenSpeedy.exe" artifacts\
         copy "build\CMAKE-64bit-Release\speedpatch64.dll" artifacts\
         copy "build\CMAKE-64bit-Release\bridge64.exe" artifacts\
-        copy "build\CMAKE-32bit-Release\speedpatch32.dll" artifacts\
-        copy "build\CMAKE-32bit-Release\bridge32.exe" artifacts\
         dir artifacts
 
-    # 上传编译结果
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: OpenSpeedy-cloud-build
+        name: OpenSpeedy-64bit-build
         path: artifacts/
