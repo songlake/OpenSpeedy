@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "cpuutils.h"
+#include <intrin.h>   // 添加，支持 __cpuid
+#include <cstring>    // 添加，支持 memcpy
 
 CpuUtils::CpuUtils()
 {
