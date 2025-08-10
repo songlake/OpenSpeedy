@@ -14,7 +14,7 @@ jobs:
 
     - name: List all Qt versions and architectures
       run: |
-        echo "=== 全部 Qt 版本和架构 ==="
+        echo "=== 所有 Qt 版本和架构 ==="
         python -m aqt list-qt windows desktop
 
     - name: List architectures for Qt 6.6.0
