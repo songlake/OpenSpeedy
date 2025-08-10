@@ -2,9 +2,6 @@ name: Build OpenSpeedy (64-bit Cloud)
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
 
 jobs:
   build64:
@@ -23,12 +20,12 @@ jobs:
         echo "QT_DIR=C:\Qt\5.15.2\msvc2019_64" | Out-File -FilePath $env:GITHUB_ENV -Append
         echo "CMAKE_PREFIX_PATH=C:\Qt\5.15.2\msvc2019_64" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-    - name: Build
+    - name: Build 64-bit
       shell: cmd
       run: |
-        call "%QT_DIR%\bin\qtenv2.bat"
-        cmake -B build -S . -G "Ninja" -DCMAKE_BUILD_TYPE=Release
-        cmake --build build --config Release
+        echo Building 64-bit...
+        call script\initenv.bat
+        call script\build64.bat
 
     - name: Collect artifacts
       run: |
