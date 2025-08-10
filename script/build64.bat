@@ -29,3 +29,9 @@ cmake.exe ^
 -B %BUILD_DIR%
 
 cmake.exe --build "%BUILD_DIR%" --config Release
+
+REM 用 windeployqt 自动复制所有 Qt 依赖 DLL 到 Release 目录
+echo Running windeployqt to deploy Qt dependencies...
+"%QT_INSTALL_PREFIX%\bin\windeployqt.exe" "%BUILD_DIR%\Release\OpenSpeedy.exe"
+
+echo Build and deploy finished.
