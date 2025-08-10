@@ -1,4 +1,4 @@
-name: Debug Qt Architectures
+name: Debug Qt Architectures (aqt 3.x)
 
 on:
   workflow_dispatch:
@@ -12,22 +12,22 @@ jobs:
         python -m pip install --upgrade pip
         pip install aqtinstall
 
-    - name: List all Qt versions and architectures
+    - name: List all Qt versions
       run: |
-        echo "=== 所有 Qt 版本和架构 ==="
-        python -m aqt list-qt windows desktop
+        echo "=== 所有 Qt 版本 ==="
+        python -m aqt list-qt-official windows desktop
 
     - name: List architectures for Qt 6.6.0
       run: |
-        echo "=== Qt 6.6.0 可用架构 ==="
-        python -m aqt list-qt windows desktop 6.6.0
+        echo "=== Qt 6.6.0 架构 ==="
+        python -m aqt list-qt-official windows desktop 6.6.0
 
     - name: List architectures for Qt 6.6.1
       run: |
-        echo "=== Qt 6.6.1 可用架构 ==="
-        python -m aqt list-qt windows desktop 6.6.1
+        echo "=== Qt 6.6.1 架构 ==="
+        python -m aqt list-qt-official windows desktop 6.6.1
 
     - name: List architectures for Qt 6.6.3
       run: |
-        echo "=== Qt 6.6.3 可用架构 ==="
-        python -m aqt list-qt windows desktop 6.6.3
+        echo "=== Qt 6.6.3 架构 ==="
+        python -m aqt list-qt-official windows desktop 6.6.3
