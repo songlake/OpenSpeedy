@@ -25,7 +25,7 @@ jobs:
       run: |
         echo Building 64-bit...
         call script\initenv.bat
-        call script\build64.bat
+        call script\build64_cloud.bat
 
     - name: Collect artifacts
       run: |
